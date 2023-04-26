@@ -1,0 +1,15 @@
+v86/src/rust/config.rs has a constant:
+
+pub const FORCE_DISABLE_JIT: bool = false
+
+We'd like to replace it with a runtime flag:
+ ?jit_disable=1
+
+So first we check where this constant is used and start our changes
+from the cycle_internal function defined in src/rust/cpu/cpu.rs.
+Then we keep building the call graph by searching for cycle_internal and its caller and so on.
+We pass force_disable_jit flag to all those functions.
+Ultimately that leads us to CPU.prototype.main_run defined in src/cpu.js and its caller
+in src/main.js.
+Here we have hardcoded the force_disable_jit argument to false. It is the only remaining thing
+that should be changed to read form a runtime flag instead.
